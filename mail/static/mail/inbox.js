@@ -79,7 +79,15 @@ function load_mailbox(mailbox, message = "") {
   fetch(`/emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
-      emails.forEach(show_email_item);
+      emails.forEach((item) => {
+        const parent_element = document.createElement("div");
+
+        compose_div(item, parent_element, mailbox);
+
+        // TODO: Add an event listener.
+        // parent_element.addEventListener();
+        document.querySelector("#emails-view").appendChild(parent_element);
+      });
     })
     .catch((error) => console.error(error));
 }
@@ -104,29 +112,20 @@ function make_alert(message) {
 }
 
 /**
- * Renders an email preview.
- * @param {JSON} item An email data given by the server.
- */
-function show_email_item(item) {
-  const parent_element = document.createElement("div");
-
-  compose_div(item, parent_element);
-
-  // TODO: Add an event listener.
-  // parent_element.addEventListener();
-  document.querySelector("#emails-view").appendChild(parent_element);
-}
-
-/**
  * Sets and styles an email div according to the given data.
  * @param {JSON} item An email from the returning list.
  * @param {Element} parent_element The element that will be composed.
  */
-function compose_div(item, parent_element) {
+function compose_div(item, parent_element, mailbox) {
   const content = document.createElement("div");
 
   const recipients = document.createElement("strong");
-  recipients.innerHTML = item["recipients"].join(", ") + " ";
+  if (mailbox === "sent") {
+    recipients.innerHTML = item["recipients"].join(", ") + " ";
+  }
+  else {
+    recipients.innerHTML = item["sender"] + " ";
+  }
   content.appendChild(recipients);
 
   content.innerHTML += item["subject"];
@@ -134,17 +133,20 @@ function compose_div(item, parent_element) {
   // Set and style the date.
   const date = document.createElement("div");
   date.innerHTML = item["timestamp"];
-  date.className = "text-muted";
   date.style.display = "inline-block";
   date.style.float = "right";
+
+  if (item["read"]) {
+    parent_element.style.backgroundColor = "grey";
+    date.style.color = "black";
+  } else {
+    date.className = "text-muted";
+  }
   content.appendChild(date);
 
   content.style.padding = "10px";
   parent_element.appendChild(content);
 
-  if (item["read"]) {
-    parent_element.style.backgroundColor = "grey";
-  }
 
   // Style the parent element.
   parent_element.style.margin = "5px";

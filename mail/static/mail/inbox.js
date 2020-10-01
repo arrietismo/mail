@@ -75,6 +75,7 @@ function load_mailbox(mailbox, message = "") {
     mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
     }</h3>`;
 
+  // Get data of the corresponding mailbox from the server.
   fetch(`/emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
@@ -83,6 +84,10 @@ function load_mailbox(mailbox, message = "") {
     .catch((error) => console.error(error));
 }
 
+/**
+ * Renders a bootstrap alert according to the returning status.
+ * @param {JSON} message The status message that the server returns
+ */
 function make_alert(message) {
   const element = document.createElement("div");
   element.classList.add("alert");
@@ -98,6 +103,10 @@ function make_alert(message) {
   document.querySelector("#message-div").appendChild(element);
 }
 
+/**
+ * Renders an email preview.
+ * @param {JSON} item An email data given by the server.
+ */
 function show_email_item(item) {
   const parent_element = document.createElement("div");
 
@@ -108,21 +117,26 @@ function show_email_item(item) {
   document.querySelector("#emails-view").appendChild(parent_element);
 }
 
+/**
+ * Sets and styles an email div according to the given data.
+ * @param {JSON} item An email from the returning list.
+ * @param {Element} parent_element The element that will be composed.
+ */
 function compose_div(item, parent_element) {
   const content = document.createElement("div");
 
   const recipients = document.createElement("strong");
   recipients.innerHTML = item["recipients"].join(", ") + " ";
-
   content.appendChild(recipients);
+
   content.innerHTML += item["subject"];
 
+  // Set and style the date.
   const date = document.createElement("div");
   date.innerHTML = item["timestamp"];
   date.className = "text-muted";
   date.style.display = "inline-block";
   date.style.float = "right";
-
   content.appendChild(date);
 
   content.style.padding = "10px";
@@ -132,6 +146,7 @@ function compose_div(item, parent_element) {
     parent_element.style.backgroundColor = "grey";
   }
 
+  // Style the parent element.
   parent_element.style.margin = "5px";
   parent_element.style.borderStyle = "solid";
   parent_element.style.borderWidth = "3px";

@@ -94,6 +94,7 @@ function show_email_item(item) {
   const parent_element = document.createElement("div");
 
   compose_div(item, parent_element);
+  parent_element.style.margin = "10px";
 
   // TODO: Add an event listener.
   // parent_element.addEventListener();
@@ -101,23 +102,26 @@ function show_email_item(item) {
 }
 
 function compose_div(item, parent_element) {
-  const left_side = document.createElement("p");
+  const content = document.createElement("div");
 
   const recipients = document.createElement("strong");
   recipients.innerHTML = item["recipients"].join(", ") + " ";
 
-  left_side.appendChild(recipients);
-  left_side.innerHTML += item["subject"];
+  content.appendChild(recipients);
+  content.innerHTML += item["subject"];
 
-  parent_element.appendChild(left_side);
-
-  const date = document.createElement("p");
+  const date = document.createElement("div");
   date.innerHTML = item["timestamp"];
-  date.style.textAlign = "right";
   date.className = "text-muted";
+  date.style.display = "inline-block";
+  date.style.float = "right";
 
-  parent_element.appendChild(date);
+  content.appendChild(date);
+
+  content.style.padding = "10px";
+  parent_element.appendChild(content);
 
   parent_element.style.margin = "5px";
+  parent_element.style.borderStyle = "solid";
   parent_element.style.borderWidth = "3px";
 }

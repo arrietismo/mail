@@ -13,13 +13,17 @@ document.addEventListener('DOMContentLoaded', function () {
   load_mailbox('inbox');
 });
 
+// TODO: Add a success or error message.
 function send_email(event) {
+  // Modifies the default beheavor so it doesn't reload the page after submitting.
   event.preventDefault();
 
+  // Get the required fields.
   const recipients = document.querySelector("#compose-recipients").value;
   const subject = document.querySelector("#compose-subject").value;
   const body = document.querySelector("#compose-body").value;
 
+  // Send the data to the server.
   fetch("/emails", {
     method: "POST",
     body: JSON.stringify({
@@ -28,9 +32,10 @@ function send_email(event) {
       body: body
     })
   })
+    // Take the return data and parse it in JSON format.
     .then(response => response.json())
     .then(result => {
-      load_mailbox("inbox", result);
+      load_mailbox("sent");
     })
     .catch(error => alert(error));
 }
@@ -76,4 +81,43 @@ function load_mailbox(mailbox, message = "") {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  fetch(`/emails/${mailbox}`)
+    .then(response => response.json())
+    .then(emails => {
+      emails.forEach(show_email_item);
+    })
+    .catch(error => console.error(error))
+}
+
+function show_email_item(item) {
+  const parent_element = document.createElement("div");
+
+  compose_div(item, parent_element);
+
+  // TODO: Add an event listener.
+  // parent_element.addEventListener();
+  document.querySelector("#emails-view").appendChild(parent_element);
+}
+
+function compose_div(item, parent_element) {
+  const left_side = document.createElement("p");
+
+  const recipients = document.createElement("strong");
+  recipients.innerHTML = item["recipients"].join(", ") + " ";
+
+  left_side.appendChild(recipients);
+  left_side.innerHTML += item["subject"];
+
+  parent_element.appendChild(left_side);
+
+  const date = document.createElement("p");
+  date.innerHTML = item["timestamp"];
+  date.style.textAlign = "right";
+  date.className = "text-muted";
+
+  parent_element.appendChild(date);
+
+  parent_element.style.margin = "5px";
+  parent_element.style.borderWidth = "3px";
 }

@@ -49,6 +49,7 @@ function send_email(event) {
 function compose_email() {
   // Show compose view and hide other views
   document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "none";
   document.querySelector("#compose-view").style.display = "block";
 
   // Clear out composition fields
@@ -69,10 +70,10 @@ function load_mailbox(mailbox, message = "") {
   // Show the mailbox and hide other views
   document.querySelector("#emails-view").style.display = "block";
   document.querySelector("#compose-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "none";
 
   // Show the mailbox name
-  document.querySelector("#emails-view").innerHTML = `<h3>${
-    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+  document.querySelector("#emails-view").innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
     }</h3>`;
 
   // Get data of the corresponding mailbox from the server.
@@ -83,7 +84,7 @@ function load_mailbox(mailbox, message = "") {
 
         const parent_element = document.createElement("div");
 
-        compose_div(item, parent_element, mailbox);
+        build_emails(item, parent_element, mailbox);
 
         parent_element.addEventListener("click", () => show_email_info(item["id"]));
         document.querySelector("#emails-view").appendChild(parent_element);
@@ -117,7 +118,7 @@ function make_alert(message) {
  * @param {JSON} item An email from the returning list.
  * @param {Element} parent_element The element that will be composed.
  */
-function compose_div(item, parent_element, mailbox) {
+function build_emails(item, parent_element, mailbox) {
   const content = document.createElement("div");
 
   const recipients = document.createElement("strong");
@@ -157,12 +158,49 @@ function compose_div(item, parent_element, mailbox) {
 }
 
 function show_email_info(id) {
+  document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "block";
+
+  // Erase any email that was here
   document.querySelector("#email-view").innerHTML = "";
 
   fetch(`/emails/${id}`)
     .then(response => response.json())
     .then(result => {
-      // TODO: Build and style the email info page.
+      build_email(result);
     })
     .catch(error => console.log(error));
+}
+
+/**
+ * Builds and styles a webpage about a certain email's info.
+ * @param {JSON} data A JSON that contains a email information.
+ */
+function build_email(data) {
+  const from = document.createElement("div");
+  const to = document.createElement("div");
+  const subject = document.createElement("div");
+  const timestamp = document.createElement("div");
+  const reply_button = document.createElement("button");
+  const body = document.createElement("div");
+
+  from.innerHTML = `<strong>From: </strong> ${data["sender"]}`;
+  to.innerHTML = `<strong>To: </strong> ${data["recipients"].join(", ")}`;
+  subject.innerHTML = `<strong>Subject: </strong> ${data["subject"]}`;
+  timestamp.innerHTML = `<strong>Timestamp: </strong> ${data["timestamp"]}`;
+  body.innerHTML = data["body"];
+
+  reply_button.innerHTML = "Reply";
+  reply_button.classList = "btn btn-outline-primary";
+  reply_button.addEventListener("click", () => {
+    // TODO: Add a textarea that appears when this event happens
+  });
+
+  document.querySelector("#email-view").appendChild(from);
+  document.querySelector("#email-view").appendChild(to);
+  document.querySelector("#email-view").appendChild(subject);
+  document.querySelector("#email-view").appendChild(timestamp);
+  document.querySelector("#email-view").appendChild(reply_button);
+  document.querySelector("#email-view").appendChild(document.createElement("hr"));
+  document.querySelector("#email-view").appendChild(body);
 }

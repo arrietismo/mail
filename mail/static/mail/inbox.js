@@ -80,13 +80,14 @@ function load_mailbox(mailbox, message = "") {
     .then((response) => response.json())
     .then((emails) => {
       emails.forEach((item) => {
+
         const parent_element = document.createElement("div");
 
         compose_div(item, parent_element, mailbox);
 
-        // TODO: Add an event listener.
-        // parent_element.addEventListener();
+        parent_element.addEventListener("click", () => show_email_info(item["id"]));
         document.querySelector("#emails-view").appendChild(parent_element);
+
       });
     })
     .catch((error) => console.error(error));
@@ -153,4 +154,15 @@ function compose_div(item, parent_element, mailbox) {
   parent_element.style.borderStyle = "solid";
   parent_element.style.borderWidth = "3px";
   parent_element.style.margin = "10px";
+}
+
+function show_email_info(id) {
+  document.querySelector("#email-view").innerHTML = "";
+
+  fetch(`/emails/${id}`)
+    .then(response => response.json())
+    .then(result => {
+      // TODO: Build and style the email info page.
+    })
+    .catch(error => console.log(error));
 }

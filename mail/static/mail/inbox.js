@@ -119,6 +119,13 @@ function make_alert(message) {
  * @param {Element} parent_element The element that will be composed.
  */
 function build_emails(item, parent_element, mailbox) {
+  if (mailbox === "inbox" && item["archived"]) {
+    return;
+  }
+  else if (mailbox === "archive" && !item["archived"]) {
+    return;
+  }
+
   const content = document.createElement("div");
 
   const recipients = document.createElement("strong");
@@ -190,16 +197,24 @@ function build_email(data) {
   timestamp.innerHTML = `<strong>Timestamp: </strong> ${data["timestamp"]}`;
   body.innerHTML = data["body"];
 
+  // * Archive button
+  archive_button.innerHTML = '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-archive-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8H.8z"/></svg>  ';
+  if (data["archived"]) {
+    archive_button.innerHTML += "Unarchive";
+  } else {
+    archive_button.innerHTML += "Archive";
+  }
+  archive_button.classList = "btn btn-outline-primary m-2";
+  archive_button.addEventListener("click", () => {
+    archive_email(data);
+    load_mailbox("inbox");
+  });
+
+  // * Reply button
   reply_button.innerHTML = '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-reply-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.079 11.9l4.568-3.281a.719.719 0 0 0 0-1.238L9.079 4.1A.716.716 0 0 0 8 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/></svg>  Reply';
   reply_button.classList = "btn btn-outline-primary m-2";
   reply_button.addEventListener("click", () => {
     // TODO: Add a textarea that appears when this event happens
-  });
-
-  archive_button.innerHTML = '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-archive-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8H.8z"/></svg>  Archive';
-  archive_button.classList = "btn btn-outline-primary m-2";
-  archive_button.addEventListener("click", () => {
-    // TODO: Archive the email.
   });
 
   document.querySelector("#email-view").appendChild(from);
@@ -210,4 +225,14 @@ function build_email(data) {
   document.querySelector("#email-view").appendChild(reply_button);
   document.querySelector("#email-view").appendChild(document.createElement("hr"));
   document.querySelector("#email-view").appendChild(body);
+}
+
+function archive_email(data) {
+  fetch(`/emails/${data["id"]}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      archived: !data["archived"]
+    })
+  });
+
 }

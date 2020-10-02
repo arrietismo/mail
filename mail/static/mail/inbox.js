@@ -182,6 +182,7 @@ function build_email(data) {
   const subject = document.createElement("div");
   const timestamp = document.createElement("div");
   const reply_button = document.createElement("button");
+  const archive_button = document.createElement("button");
   const body = document.createElement("div");
 
   from.innerHTML = `<strong>From: </strong> ${data["sender"]}`;
@@ -196,10 +197,17 @@ function build_email(data) {
     // TODO: Add a textarea that appears when this event happens
   });
 
+  archive_button.innerHTML = "Archive";
+  archive_button.classList = "btn btn-outline-primary";
+  archive_button.addEventListener("click", () => {
+    // TODO: Archive the email.
+  });
+
   document.querySelector("#email-view").appendChild(from);
   document.querySelector("#email-view").appendChild(to);
   document.querySelector("#email-view").appendChild(subject);
   document.querySelector("#email-view").appendChild(timestamp);
+  document.querySelector("#email-view").appendChild(archive_button);
   document.querySelector("#email-view").appendChild(reply_button);
   document.querySelector("#email-view").appendChild(document.createElement("hr"));
   document.querySelector("#email-view").appendChild(body);

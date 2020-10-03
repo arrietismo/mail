@@ -213,9 +213,7 @@ function build_email(data) {
   // * Reply button
   reply_button.innerHTML = '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-reply-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.079 11.9l4.568-3.281a.719.719 0 0 0 0-1.238L9.079 4.1A.716.716 0 0 0 8 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/></svg>  Reply';
   reply_button.classList = "btn btn-outline-primary m-2";
-  reply_button.addEventListener("click", () => {
-    // TODO: Add a textarea that appears when this event happens
-  });
+  reply_button.addEventListener("click", () => compose_reply(data));
 
   document.querySelector("#email-view").appendChild(from);
   document.querySelector("#email-view").appendChild(to);
@@ -234,5 +232,16 @@ function archive_email(data) {
       archived: !data["archived"]
     })
   });
+}
 
+function compose_reply(data) {
+  // Show compose view and hide other views
+  document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "none";
+  document.querySelector("#compose-view").style.display = "block";
+
+  // Clear out composition fields
+  document.querySelector("#compose-recipients").value = data["sender"];
+  document.querySelector("#compose-subject").value = ((data["subject"].match(/^(Re:)\s/)) ? data["subject"] : "Re: " + data["subject"]);
+  document.querySelector("#compose-body").value = `On ${data["timestamp"]} ${data["sender"]} wrote:\n${data["body"]}\n-------------------------------------\n`;
 }

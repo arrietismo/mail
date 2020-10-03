@@ -86,7 +86,7 @@ function load_mailbox(mailbox, message = "") {
 
         build_emails(item, parent_element, mailbox);
 
-        parent_element.addEventListener("click", () => show_email_info(item["id"]));
+        parent_element.addEventListener("click", () => read_email(item["id"]));
         document.querySelector("#emails-view").appendChild(parent_element);
 
       });
@@ -163,19 +163,28 @@ function build_emails(item, parent_element, mailbox) {
   parent_element.style.margin = "10px";
 }
 
-function show_email_info(id) {
+function read_email(id) {
   document.querySelector("#emails-view").style.display = "none";
   document.querySelector("#email-view").style.display = "block";
 
   // Erase any email that was here
   document.querySelector("#email-view").innerHTML = "";
 
+  // Get the email's info and build the section.
   fetch(`/emails/${id}`)
     .then(response => response.json())
     .then(result => {
       build_email(result);
     })
     .catch(error => console.log(error));
+
+  // Set the email to read.
+  fetch(`/emails/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      read: true
+    })
+  });
 }
 
 /**

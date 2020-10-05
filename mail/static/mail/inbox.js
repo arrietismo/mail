@@ -163,6 +163,10 @@ function build_emails(item, parent_element, mailbox) {
   parent_element.style.margin = "10px";
 }
 
+/**
+ * Builds a webpage about the internal information of an email.
+ * @param {int} id The id of the email
+ */
 function read_email(id) {
   document.querySelector("#emails-view").style.display = "none";
   document.querySelector("#email-view").style.display = "block";
@@ -234,6 +238,10 @@ function build_email(data) {
   document.querySelector("#email-view").appendChild(body);
 }
 
+/**
+ * Toggles the archive status of an email.
+ * @param {JSON} data The data of a certain email
+ */
 function archive_email(data) {
   fetch(`/emails/${data["id"]}`, {
     method: "PUT",
@@ -243,6 +251,10 @@ function archive_email(data) {
   });
 }
 
+/**
+ * Loads the compose mailbox with   
+ * @param {JSON} data The data of a certain email.
+ */
 function compose_reply(data) {
   // Show compose view and hide other views
   document.querySelector("#emails-view").style.display = "none";

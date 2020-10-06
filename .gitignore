@@ -13,3 +13,4 @@ project3/__pycache__/settings.cpython-38.pyc
 project3/__pycache__/urls.cpython-38.pyc
 project3/__pycache__/wsgi.cpython-38.pyc
 db.sqlite3
+.vscode/settings.json
